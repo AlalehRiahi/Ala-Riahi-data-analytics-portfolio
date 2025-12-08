@@ -24,11 +24,17 @@ The project uses:
 - User experience appears stable and consistent across multiple dimensions  
 
 ## How to Run
-You can open the notebook directly on GitHub or run it in Google Colab.
+You can view the notebook on GitHub or open it directly in Google Colab.
 
-To load the dataset via GitHub in Colab:
+### Dataset Source
+The dataset used in this project is stored in the GitHub repository 
+**Ala-Riahi-data-analytics-portfolio**.  
+The notebook loads the data automatically from the following raw URL:
 
-```python
-url =(https://raw.githubusercontent.com/AlalehRiahi/Ala-Riahi-data-analytics-portfolio/refs/heads/main/project2_ai-assistant-statistical-analysis/data/Daily_AI_Assistant_Usage_Behavior_Dataset.csv)
-df = pd.read_csv(url)
-df['timestamp'] = pd.to_datetime(df['timestamp'])
+https://raw.githubusercontent.com/AlalehRiahi/Ala-Riahi-data-analytics-portfolio/main/project2_ai-assistant-statistical-analysis/data/Daily_AI_Assistant_Usage_Behavior_Dataset.csv
+
+## Open the Notebook in Google Colab
+
+You can run the full analysis directly in Colab:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AlalehRiahi/Ala-Riahi-data-analytics-portfolio/blob/main/project2_ai-assistant-statistical-analysis/notebooks/ai_assistant_behavior_analysis.ipynb)
