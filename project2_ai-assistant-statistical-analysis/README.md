@@ -37,4 +37,4 @@ https://raw.githubusercontent.com/AlalehRiahi/Ala-Riahi-data-analytics-portfolio
 
 You can run the full analysis directly in Colab:
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AlalehRiahi/Ala-Riahi-data-analytics-portfolio/blob/main/project2_ai-assistant-statistical-analysis/notebooks/ai_assistant_behavior_analysis.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AlalehRiahi/Ala-Riahi-data-analytics-portfolio/blob/main/project2_ai-assistant-statistical-analysis/Notebook/ai_assistant_behavior_analysis.ipynb)
