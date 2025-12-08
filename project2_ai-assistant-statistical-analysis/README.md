@@ -29,6 +29,6 @@ You can open the notebook directly on GitHub or run it in Google Colab.
 To load the dataset via GitHub in Colab:
 
 ```python
-url = "RAW_GITHUB_LINK_TO_DATASET"
+url =(https://raw.githubusercontent.com/AlalehRiahi/Ala-Riahi-data-analytics-portfolio/refs/heads/main/project2_ai-assistant-statistical-analysis/data/Daily_AI_Assistant_Usage_Behavior_Dataset.csv)
 df = pd.read_csv(url)
 df['timestamp'] = pd.to_datetime(df['timestamp'])
