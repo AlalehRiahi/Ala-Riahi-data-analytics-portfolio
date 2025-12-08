@@ -20,7 +20,7 @@ I designed these projects to simulate real-world scenarios in SaaS, behavioral d
 
 A conceptual project where I model user lifecycle and retention behavior in an adaptive learning platform. I design a realistic data schema, perform segment-based analysis, build Tableau retention dashboards, and develop product recommendations. Includes a conceptual demonstration of a GenAI query assistant for rapid stakeholder insights.
 
- **View project →** `project1_saas_tableau`  
+ **View project →** [`project1_saas_tableau` ](https://public.tableau.com/app/profile/ala.riahi/vizzes) 
  **Tableau Dashboards →** (link once published)
 
 ---
