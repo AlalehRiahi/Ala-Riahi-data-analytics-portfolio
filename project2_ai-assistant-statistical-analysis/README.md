@@ -1,24 +1,34 @@
-## Project Summary
+# Project 2: Statistical Analysis of AI Assistant User Behavior
 
-This project analyzes user behavior and model performance in an AI assistant dataset 
-using Python-based statistical methods. The results show high stability across devices, 
-models, and interaction patterns.
+This project analyzes a dataset of AI assistant interactions using Python. The goal is to 
+explore behavioral patterns, compare model performance, and evaluate whether factors such 
+as device type, session length, prompt length, or token usage influence user satisfaction.
 
-### Key Findings
-- **Satisfaction is consistent:** No significant differences across device type or 
-  assistant model (ANOVA p-values > 0.05).
-- **Model efficiency is similar:** No significant difference in token usage across GPT-4o, 
-  GPT-5, and GPT-5.1.
-- **No significant correlations:** Prompt length, session duration, tokens used, and 
-  satisfaction ratings show no meaningful linear relationships (Pearson p-values > 0.05).
+## Project Contents
+- **notebook/** — Jupyter/Colab notebook containing the full analysis  
+- **data/** — Dataset used for statistical testing  
 
-### Interpretation
-The AI assistant provides a uniform user experience across platforms and workloads. 
-Statistical tests confirm that interaction patterns are stable and largely independent 
-of model or device.
 
-### Skills Demonstrated
-- Python data analysis (Pandas, Seaborn)
-- Statistical hypothesis testing (ANOVA, Pearson)
-- Data visualization and interpretation
-- Reproducible notebook workflow
+## Methods
+The project uses:
+- Exploratory data analysis (EDA)
+- Visualization (Matplotlib, Seaborn)
+- ANOVA for comparing groups
+- Pearson correlation tests for numeric relationships
+- Statistical interpretation of p-values and effect sizes
+
+## Key Findings
+- Satisfaction does not differ significantly by device or assistant model  
+- Token usage does not meaningfully differ across models  
+- No significant correlations between prompt length, session duration, tokens, or satisfaction  
+- User experience appears stable and consistent across multiple dimensions  
+
+## How to Run
+You can open the notebook directly on GitHub or run it in Google Colab.
+
+To load the dataset via GitHub in Colab:
+
+```python
+url = "RAW_GITHUB_LINK_TO_DATASET"
+df = pd.read_csv(url)
+df['timestamp'] = pd.to_datetime(df['timestamp'])
