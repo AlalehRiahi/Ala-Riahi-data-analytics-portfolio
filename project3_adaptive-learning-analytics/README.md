@@ -128,3 +128,4 @@ The notebook loads the dataset automatically from the raw GitHub link:
 https://raw.githubusercontent.com/AlalehRiahi/Ala-Riahi-data-analytics-portfolio/refs/heads/main/project3_adaptive-learning-analytics/data/chemistry_learning_dataset.csv
 
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AlalehRiahi/Ala-Riahi-data-analytics-portfolio/blob/main/project3_adaptive-learning-analytics/Notebook/Adaptive_Learning_Behavior_Analysis_in_Python.ipynb)
