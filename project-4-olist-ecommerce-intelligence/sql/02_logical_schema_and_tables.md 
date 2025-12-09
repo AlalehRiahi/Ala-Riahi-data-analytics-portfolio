@@ -1,0 +1,304 @@
+# Analytical Star Schema – Logical Table Design
+
+This document defines the **analytics-friendly schema** built on top of the raw Olist tables.
+
+The goal is to create a **clean star schema** that can be consumed consistently by:
+
+- SQL (for KPIs & feature tables)
+- Excel (for dashboards)
+- Python (for statistical analysis & modeling)
+- Tableau (for interactive visualizations)
+
+We keep the original grain of each business process while adding **engineered fields** for
+delivery performance and customer satisfaction.
+
+---
+
+## 1. Design Principles
+
+1. Separate **facts** (events / transactions) and **dimensions** (entities / descriptors).
+2. Use **surrogate integer keys** where convenient for joins and BI tools.
+3. Keep each fact table at a **clear, single grain**.
+4. Standardize common derived metrics:
+   - `delivery_delay_days`
+   - `is_late_delivery`
+   - `review_delay_days`
+   - `is_low_review` / `is_high_review`
+   - `distance_seller_customer_km` (optional / advanced)
+5. Ensure every table can be joined through consistent keys:
+   - `customer_id`, `order_id`, `seller_id`, `product_id`, `date_key`, etc.
+
+---
+
+## 2. Fact Tables
+
+### 2.1 `fact_orders`
+
+**Grain:** 1 row per `order_id` (one row per order)  
+**Source tables:** `olist_orders_dataset`, `olist_customers_dataset`, `olist_order_payments_dataset` (aggregated)
+
+**Key columns:**
+
+- `order_id` (PK)
+- `customer_id` (FK → `dim_customers.customer_id`)
+- `order_status`
+- `purchase_timestamp`
+- `approved_at`
+- `delivered_carrier_date`
+- `delivered_customer_date`
+- `estimated_delivery_date`
+
+**Engineered fields:**
+
+- `purchase_date_key` – FK → `dim_date`
+- `delivered_date_key` – FK → `dim_date` (nullable if not delivered)
+- `days_to_approve` = `approved_at` – `purchase_timestamp`
+- `days_to_ship` = `delivered_carrier_date` – `approved_at`
+- `days_to_deliver` = `delivered_customer_date` – `delivered_carrier_date`
+- `delivery_delay_days` = `delivered_customer_date` – `estimated_delivery_date`
+- `is_late_delivery` (boolean: 1 if `delivery_delay_days > 0`, else 0)
+
+**Payment aggregates (from `olist_order_payments_dataset`):**
+
+- `total_payment_value`
+- `total_freight_value` (if computed from items) – optional
+- `num_payment_installments`
+- `is_multi_payment_method` (1 if >1 payment types per order)
+- `main_payment_type` (most frequent / max value payment_type per order)
+
+---
+
+### 2.2 `fact_order_items`
+
+**Grain:** 1 row per (`order_id`, `order_item_id`)  
+**Source tables:** `olist_order_items_dataset`, `olist_products_dataset`, `olist_sellers_dataset`
+
+**Key columns:**
+
+- `order_item_key` (surrogate PK, optional)
+- `order_id` (FK → `fact_orders.order_id`)
+- `order_item_id` (original sequence)
+- `product_id` (FK → `dim_products.product_id`)
+- `seller_id` (FK → `dim_sellers.seller_id`)
+
+**Measures:**
+
+- `price`
+- `freight_value`
+- `shipping_limit_date`
+
+**Engineered fields:**
+
+- `shipping_limit_date_key` – FK → `dim_date`
+- `is_high_freight_share` = freight_value / price > threshold (optional flag)
+- `item_revenue` = `price`
+- `item_total_value` = `price + freight_value`
+
+This table is ideal for **product/category-level** and **seller-level** analysis.
+
+---
+
+### 2.3 `fact_reviews`
+
+**Grain:** 1 row per `review_id`  
+(But effectively 0–1 review per `order_id`.)
+
+**Source table:** `olist_order_reviews_dataset` (+ join to `fact_orders` for dates if needed)
+
+**Key columns:**
+
+- `review_id` (PK)
+- `order_id` (FK → `fact_orders.order_id`)
+- `review_score` (1–5)
+
+**Text fields (optional for NLP / advanced work):**
+
+- `review_comment_title`
+- `review_comment_message`
+
+**Engineered fields:**
+
+- `review_creation_date_key` – FK → `dim_date`
+- `review_answer_date_key` – FK → `dim_date` (if used)
+- `review_delay_days` = `review_creation_date` – `delivered_customer_date`
+- `is_low_review` = 1 if `review_score <= 2`, else 0
+- `is_high_review` = 1 if `review_score >= 4`, else 0
+- `is_neutral_review` = 1 if `review_score = 3`, else 0
+
+This is the primary table for **customer satisfaction modeling**.
+
+---
+
+## 3. Dimension Tables
+
+### 3.1 `dim_customers`
+
+**Grain:** 1 row per `customer_id`  
+**Source:** `olist_customers_dataset` (+ optional aggregates from orders)
+
+**Columns:**
+
+- `customer_id` (PK)
+- `customer_unique_id` (original Olist field)
+- `customer_zip_code_prefix`
+- `customer_city`
+- `customer_state`
+
+**Optional engineered attributes:**
+
+- `first_order_date_key`
+- `last_order_date_key`
+- `num_orders` (lifetime orders)
+- `is_returning_customer` (1 if `num_orders > 1`)
+
+---
+
+### 3.2 `dim_sellers`
+
+**Grain:** 1 row per `seller_id`  
+**Source:** `olist_sellers_dataset`
+
+**Columns:**
+
+- `seller_id` (PK)
+- `seller_zip_code_prefix`
+- `seller_city`
+- `seller_state`
+
+**Optional aggregates (from items/orders):**
+
+- `num_orders_served`
+- `avg_delivery_delay_days`
+- `avg_review_score`
+- `seller_tier` (derived segmentation, e.g., high / medium / low performance)
+
+---
+
+### 3.3 `dim_products`
+
+**Grain:** 1 row per `product_id`  
+**Source:** `olist_products_dataset`, `product_category_name_translation`
+
+**Columns:**
+
+- `product_id` (PK)
+- `product_category_name` (Portuguese)
+- `product_category_name_english`
+- `product_name_length` (if provided)
+- `product_description_length`
+- `product_photos_qty`
+- `product_weight_g`
+- `product_length_cm`
+- `product_height_cm`
+- `product_width_cm`
+
+**Engineered fields:**
+
+- `product_volume_cm3` = length × width × height
+- `is_heavy_product` (based on weight threshold)
+- `is_bulky_product` (based on volume threshold)
+
+These attributes are useful when exploring **logistics complexity** and **delay patterns**.
+
+---
+
+### 3.4 `dim_geolocation` (optional, for distance & mapping)
+
+**Grain:** 1 row per `zip_code_prefix`  
+**Source:** `olist_geolocation_dataset`
+
+Given that the original table contains multiple rows per prefix, we can aggregate:
+
+**Columns:**
+
+- `zip_code_prefix` (PK)
+- `geolocation_city`
+- `geolocation_state`
+- `lat_median`
+- `lng_median`
+
+We may compute **one representative latitude/longitude** per zip prefix (e.g., median).
+
+This enables:
+
+- seller ↔ customer distance estimation
+- regional aggregations and maps (Tableau)
+
+---
+
+### 3.5 `dim_date`
+
+**Grain:** 1 row per calendar date  
+**Source:** generated (not in raw data; built via SQL or Python)
+
+**Columns:**
+
+- `date_key` (PK, usually `YYYYMMDD` integer or date itself)
+- `date` (date type)
+- `year`
+- `quarter`
+- `month`
+- `month_name`
+- `day`
+- `day_of_week`
+- `day_name`
+- `is_weekend`
+- `year_month` (e.g., `2017-05`)
+
+This dimension allows consistent time-based analysis for:
+
+- order purchase dates
+- delivery dates
+- review creation/answer dates
+- shipping limit dates
+
+---
+
+## 4. Relationships Summary (Analytical Schema)
+
+At the analytical layer, the main relationships:
+
+- `fact_orders.customer_id` → `dim_customers.customer_id`
+- `fact_orders.purchase_date_key` → `dim_date.date_key`
+- `fact_orders.delivered_date_key` → `dim_date.date_key`
+
+- `fact_order_items.order_id` → `fact_orders.order_id`
+- `fact_order_items.product_id` → `dim_products.product_id`
+- `fact_order_items.seller_id` → `dim_sellers.seller_id`
+- `fact_order_items.shipping_limit_date_key` → `dim_date.date_key`
+
+- `fact_reviews.order_id` → `fact_orders.order_id`
+- `fact_reviews.review_creation_date_key` → `dim_date.date_key`
+
+- `dim_customers.customer_zip_code_prefix` → `dim_geolocation.zip_code_prefix`
+- `dim_sellers.seller_zip_code_prefix` → `dim_geolocation.zip_code_prefix`
+
+This star/snowflake structure supports flexible reporting and modeling without repeatedly touching the raw CSVs.
+
+---
+
+## 5. Implementation Plan (How This Will Map to SQL Files)
+
+The following SQL scripts will implement this logical schema:
+
+1. `03_create_base_tables.sql`  
+   - Create raw-like staging tables (optional, if loading into a DB).
+
+2. `04_create_dimensions.sql`  
+   - Build `dim_date`, `dim_customers`, `dim_sellers`, `dim_products`, `dim_geolocation`.
+
+3. `05_create_fact_orders.sql`  
+   - Build `fact_orders` from orders + payments.
+
+4. `06_create_fact_order_items.sql`  
+   - Build `fact_order_items` from order_items + products + sellers.
+
+5. `07_create_fact_reviews.sql`  
+   - Build `fact_reviews` from order_reviews (+ join to orders for delay metrics).
+
+6. `08_create_feature_views_and_kpis.sql`  
+   - Create additional reporting views for Excel, Python, and Tableau.
+
+Each downstream tool (Excel, Python, Tableau) will primarily consume the **fact + dim tables** defined in this document.
+
+---
