@@ -1,9 +1,9 @@
-# 🌱 Adaptive Learning Behavior Analysis in Python  
+#  Adaptive Learning Behavior Analysis in Python  
 ### Exploring learner engagement, performance, and behavioral patterns in an adaptive chemistry learning system
 
 ---
 
-## 📌 Project Overview
+##  Project Overview
 
 This project analyzes a synthetic but realistically structured dataset modeling interactions within an **adaptive online learning system**. The goal is to understand how learners behave, how they respond to different types of content, and which factors influence performance.
 
@@ -19,7 +19,7 @@ Although the dataset is synthetic, its schema reflects real e-learning environme
 
 ---
 
-## 📊 Dataset Description
+##  Dataset Description
 
 The dataset represents interactions between learners and chemistry modules in an adaptive learning environment.
 
@@ -52,7 +52,7 @@ This structure supports research in adaptive learning, reinforcement learning, l
 
 ---
 
-## 🔍 Analysis Steps
+##  Analysis Steps
 
 ### **1. Data Overview**
 Inspection of structure, missing values, distributions, and data integrity.
@@ -90,7 +90,7 @@ Effect sizes (η², r², Cramér’s V) assess practical significance.
 
 ---
 
-## 🧠 Key Findings
+##  Key Findings
 
 - **Learning style does not predict performance**, consistent with modern educational research.  
 - **Moderate difficulty levels (3–4) produce the best performance**, suggesting a cognitive sweet spot.  
@@ -117,7 +117,7 @@ These insights align with established instructional design and learning-science 
 
 ---
 
-## 🚀 How to Run
+##  How to Run
 
 You can open the notebook directly on GitHub or run it in Google Colab.
 
