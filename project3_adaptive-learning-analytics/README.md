@@ -124,7 +124,7 @@ You can open the notebook directly on GitHub or run it in Google Colab.
 ### **Dataset Source**
 The notebook loads the dataset automatically from the raw GitHub link:
 
-```python
-url = "https://raw.githubusercontent.com/Ala-Riahi-data-analytics-portfolio/project3_adaptive-learning-analytics
-/data/chemistry_learning_dataset.csv"
-df = pd.read_csv(url)
+
+https://raw.githubusercontent.com/AlalehRiahi/Ala-Riahi-data-analytics-portfolio/refs/heads/main/project3_adaptive-learning-analytics/data/chemistry_learning_dataset.csv
+
+
